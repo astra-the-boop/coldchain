@@ -39,7 +39,9 @@ function findImg(html: string) {
 
 async function download(url: any, output: fs.PathLike) {
     const response = await axios({
-        url, method: "GET", responseType: "stream",
+        url, method: "GET", responseType: "stream", headers:{
+            "User-Agent": "Mozilla/5.0",
+        }
     });
 
     return new Promise((res, rej) => {
@@ -66,6 +68,9 @@ function replaceImgs(html: string | Buffer | AnyNode | AnyNode[], repl:Record<st
 
 
 async function main(){
+    const baseDir = "/Users/astra.celestine/Desktop/site-copy";
+    const outputDir = path.join(baseDir, "imgs");
+    fs.mkdirSync(outputDir, {recursive: true});
     const files = getFiles("/Users/astra.celestine/Desktop/site-copy");
 
     for(const file of files){
@@ -74,13 +79,17 @@ async function main(){
         const imgs = findImg(html);
 
         const repl:Record<string,string> = {};
-
+        const seen = new Set<string>;
         for(const url of imgs) {
+            if(seen.has(url)) continue;
+            seen.add(url);
             try{
-                const filename = path.basename(url);
+                const u = new URL(url);
+                const filename = decodeURIComponent(path.basename(u.pathname));
+                const outputPath = path.join(outputDir, filename);
                 const localPath = `./imgs/${filename}`;
 
-                await download(url, path.join("site-copy", "imgs", filename));
+                await download(url, outputPath);
                 repl[url] = localPath;
             } catch(err){
                 console.log(`${url} error: ${err}`)
