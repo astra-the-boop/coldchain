@@ -72,7 +72,8 @@ async function main(){
     const outputDir = path.join(baseDir, "imgs");
     fs.mkdirSync(outputDir, {recursive: true});
     const files = getFiles("/Users/astra.celestine/Desktop/site-copy");
-
+    let c:number = 0;
+    let total:number = 0;
     for(const file of files){
         if(!file.endsWith(".html")) continue;
         const html = fs.readFileSync(file, "utf8");
@@ -80,6 +81,7 @@ async function main(){
 
         const repl:Record<string,string> = {};
         const seen = new Set<string>;
+
         for(const url of imgs) {
             if(seen.has(url)) continue;
             seen.add(url);
@@ -91,6 +93,8 @@ async function main(){
 
                 await download(url, outputPath);
                 repl[url] = localPath;
+                console.log(`Successfully replaced image ${url}`);
+                c+=1;
             } catch(err){
                 console.log(`${url} error: ${err}`)
             }
@@ -98,7 +102,10 @@ async function main(){
 
         const newHTML = replaceImgs(html, repl);
         fs.writeFileSync(file, newHTML);
+        total += seen.size;
     }
+    console.log(`Replacement complete: ${c} images replaced out of ${total} found.`);
+    process.exit(0);
 }
 
 main().catch(console.error);
