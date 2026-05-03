@@ -22,5 +22,5 @@ now you can do `coldchain <project-dir>`
 
 ## stuff (idk uh hhhh h hhhh arguments and stuff)
 
-`coldchain [required: project directory] [optional: -o or --ouputDir: image output directory]`
+`coldchain [required: project directory] [optional: -o or --ouputDir: image output directory (in relative to project root dir; default: imgs)]`
 
