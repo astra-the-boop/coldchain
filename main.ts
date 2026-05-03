@@ -1,8 +1,27 @@
+#!/usr/bin/env node
 import * as fs from "fs";
 import * as path from "path";
 import * as cheerio from "cheerio";
 import axios from "axios";
 import { AnyNode } from "domhandler";
+import { Command } from "commander";
+
+const program = new Command();
+
+program
+    .name("coldchain")
+    .description("Download and de-hotlink your project")
+    .argument("<dir>", "Project directory")
+    .option("-o, --outputDir <dir>", "Image directory (default: imgs)")
+    .parse();
+
+const baseDir = program.args[0];
+const options = program.opts();
+
+if(!baseDir) {
+    console.log("Error: Please provide a directory");
+    process.exit(1);
+}
 
 function getFiles(dir: string): string[] {
     let results: string[] = [];
@@ -68,19 +87,19 @@ function replaceImgs(html: string | Buffer | AnyNode | AnyNode[], repl:Record<st
 
 
 async function main(){
-    const baseDir = "/Users/astra.celestine/Desktop/site-copy";
-    const outputDir = path.join(baseDir, "imgs");
+    let imageDir:string = options.outputDir || "imgs";
+    const outputDir = path.join(baseDir, imageDir);
     fs.mkdirSync(outputDir, {recursive: true});
-    const files = getFiles("/Users/astra.celestine/Desktop/site-copy");
+    const files = getFiles(baseDir);
     let c:number = 0;
     let total:number = 0;
     for(const file of files){
         if(!file.endsWith(".html")) continue;
         const html = fs.readFileSync(file, "utf8");
         const imgs = findImg(html);
+        const seen = new Set<string>;
 
         const repl:Record<string,string> = {};
-        const seen = new Set<string>;
 
         for(const url of imgs) {
             if(seen.has(url)) continue;
@@ -89,7 +108,7 @@ async function main(){
                 const u = new URL(url);
                 const filename = decodeURIComponent(path.basename(u.pathname));
                 const outputPath = path.join(outputDir, filename);
-                const localPath = `./imgs/${filename}`;
+                const localPath = `./${imageDir}/${filename}`;
 
                 await download(url, outputPath);
                 repl[url] = localPath;
