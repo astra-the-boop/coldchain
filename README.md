@@ -9,9 +9,13 @@ the thing scans your project directory for any and all image tags and replaces a
 ## how to use
 (insert picture of former united states president joe biden here with the capti9on biden blast)
 
+
 clone this repo
+
 cd into the repo directory
+
 npm link
+
 now you can do `coldchain <project-dir>`
 
 ---
