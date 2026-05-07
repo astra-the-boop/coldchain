@@ -11,6 +11,13 @@ written in typescript (ts type shit ts ts ts ts ts ts ts)
 ## how to use
 (insert picture of former united states president joe biden here with the capti9on biden blast)
 
+### npm
+
+make sure you have npm installed
+
+run `npm i coldchain`
+
+### manual
 
 clone this repo
 
